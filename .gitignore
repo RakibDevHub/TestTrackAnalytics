@@ -1,0 +1,36 @@
+# Ignore build and IDE-specific files
+/build/
+.gradle/
+out/
+*.iml
+*.class
+
+# Ignore NetBeans-specific files
+nbproject/private/
+nbbuild/
+nbdist/
+build.xml
+nbactions.xml
+nb-configuration.xml
+
+# Ignore Maven/Gradle-specific files
+.mvn/
+target/
+*.log
+*.war
+
+# Ignore dependency cache
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Ignore Tomcat logs and temp files
+logs/
+temp/
+work/
+
+# Ignore environment variables and credentials
+.env
+*.properties
+
+# Ignore compiled JSP files
+*.jsp~ 
