@@ -1,4 +1,4 @@
-package com.bugcheck.servlets;
+package com.rakibdevhub.bugcheck.servlets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

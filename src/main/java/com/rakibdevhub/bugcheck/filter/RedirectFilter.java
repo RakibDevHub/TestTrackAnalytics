@@ -1,4 +1,4 @@
-package com.bugcheck.filter;
+package com.rakibdevhub.bugcheck.filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;

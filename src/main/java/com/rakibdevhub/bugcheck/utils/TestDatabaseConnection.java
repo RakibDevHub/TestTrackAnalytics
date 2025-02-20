@@ -1,8 +1,8 @@
-package com.bugcheck.util;
+package com.rakibdevhub.bugcheck.utils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import com.bugcheck.config.DatabaseConfig;
+import com.rakibdevhub.bugcheck.config.DatabaseConfig;
 
 public class TestDatabaseConnection {
     public static void main(String[] args) {
