@@ -1,8 +1,8 @@
-package com.rakibdevhub.bugcheck.utils;
+package com.rakibdevhub.testtrack.utils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import com.rakibdevhub.bugcheck.config.DatabaseConfig;
+import com.rakibdevhub.testtrack.config.DatabaseConfig;
 
 public class TestDatabaseConnection {
     public static void main(String[] args) {

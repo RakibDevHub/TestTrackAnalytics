@@ -1,4 +1,4 @@
-package com.rakibdevhub.bugcheck.filter;
+package com.rakibdevhub.testtrack.filter;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -26,8 +26,6 @@ public class RedirectFilter implements Filter {
         switch (relativeUri) {
             case "/", "/index", "/index.jsp", "/home.jsp" ->
                 httpResponse.sendRedirect(contextPath + "/home");
-            case "/login.jsp", "/signin", "/signin.jsp" ->
-                httpResponse.sendRedirect(contextPath + "/login");
             default ->
                 chain.doFilter(request, response);
         }

@@ -1,4 +1,4 @@
-package com.rakibdevhub.bugcheck.config;
+package com.rakibdevhub.testtrack.config;
 
 import java.io.IOException;
 import java.io.InputStream;
