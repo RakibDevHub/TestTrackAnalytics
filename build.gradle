@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'war'
 
-group = 'com.rakibdevhub.bugcheck'
+group = 'com.rakibdevhub.testtrack'
 
 repositories {
     mavenCentral()
@@ -25,4 +25,5 @@ dependencies {
 
     // JUnit for testing
     testImplementation 'junit:junit:4.13.2'
+
 }

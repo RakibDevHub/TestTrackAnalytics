@@ -7,98 +7,122 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.io.InputStream;
 
 import com.rakibdevhub.testtrack.config.DatabaseConfig;
 
 @WebServlet("/add-test")
-@MultipartConfig(maxFileSize = 1024 * 1024 * 5)
+@MultipartConfig(maxFileSize = 10 * 1024 * 1024) // 10MB limit
 public class AddTestServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
 
-    // Display add_test.jsp form
+    private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = Logger.getLogger(AddTestServlet.class.getName());
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("add_test.jsp").forward(request, response);
     }
 
-    // Handle form submission
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Get form fields
+        // Retrieve form data
         String softwareName = request.getParameter("software_name");
-        int softwareId = Integer.parseInt(request.getParameter("software_id"));
-        String date = request.getParameter("date");
+        String testDateStr = request.getParameter("test_date");
         String testerName = request.getParameter("tester_name");
-        String bugTitle = request.getParameter("test_title");
-        String bugType = request.getParameter("test_type");
-        String bugSeverity = request.getParameter("test_severity");
+        String testTitle = request.getParameter("test_title");
+        String issueType = request.getParameter("issue_type");
+        String bugSeverity = request.getParameter("bug_severity");
         String stepsPerformed = request.getParameter("steps_performed");
         String expectedResult = request.getParameter("expected_result");
         String actualResult = request.getParameter("actual_result");
         String errorMessage = request.getParameter("error_message");
         String testResult = request.getParameter("test_result");
-        
-        // Handle file upload
-        Part filePart = request.getPart("attachment");
-        String fileName = null;
-        if (filePart != null && filePart.getSize() > 0) {
-            fileName = saveUploadedFile(filePart);
+
+        int softwareId = 0;
+        try {
+            softwareId = Integer.parseInt(request.getParameter("software_id"));
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "Invalid Software ID.");
+            request.getRequestDispatcher("add_test.jsp").forward(request, response);
+            return;
         }
 
-        // Insert into database
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(
-                "INSERT INTO bugs (software_name, software_id, test_date, tester_name, test_title, test_type, test_severity, steps_performed, expected_result, actual_result, error_message, test_result, attachment) VALUES (?, ?, TO_DATE(?, 'YYYY-MM-DD'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+        // Convert test_date to SQL Date
+        Date testDate = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date parsedDate = sdf.parse(testDateStr);
+            testDate = new Date(parsedDate.getTime());
+        } catch (ParseException e) {
+            request.setAttribute("error", "Invalid test date format.");
+            request.getRequestDispatcher("add_test.jsp").forward(request, response);
+            return;
+        }
+
+        // Handle bug severity display logic
+        if ("N/A".equals(issueType)) {
+            bugSeverity = null; // Set to null if N/A
+        }
+
+        // Convert empty error_message to NULL
+        if (errorMessage != null && errorMessage.trim().isEmpty()) {
+            errorMessage = null;
+        }
+
+        InputStream attachmentStream = null;
+        Part filePart = request.getPart("attachment");
+        if (filePart != null && filePart.getSize() > 0) {
+            attachmentStream = filePart.getInputStream();
+        }
+
+        // SQL Query
+        String sql = "INSERT INTO test_reports (software_name, software_id, test_date, tester_name, test_title, "
+                + "issue_type, bug_severity, steps_performed, expected_result, actual_result, error_message, test_result, attachment) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConfig.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, softwareName);
             stmt.setInt(2, softwareId);
-            stmt.setString(3, date);
+            stmt.setDate(3, testDate);
             stmt.setString(4, testerName);
-            stmt.setString(5, bugTitle);
-            stmt.setString(6, bugType);
+            stmt.setString(5, testTitle);
+            stmt.setString(6, issueType);
             stmt.setString(7, bugSeverity);
             stmt.setString(8, stepsPerformed);
             stmt.setString(9, expectedResult);
             stmt.setString(10, actualResult);
             stmt.setString(11, errorMessage);
             stmt.setString(12, testResult);
-            stmt.setString(13, fileName);
+            if (attachmentStream != null) {
+                stmt.setBlob(13, attachmentStream);
+            } else {
+                stmt.setNull(13, java.sql.Types.BLOB);
+            }
 
-            stmt.executeUpdate();
-            response.sendRedirect("/view-tests?success=true"); // Redirect to view page
+            int rowsInserted = stmt.executeUpdate();
+
+            if (rowsInserted > 0) {
+                request.setAttribute("message", "Test report added successfully!");
+            } else {
+                request.setAttribute("error", "Failed to add test report.");
+            }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            response.sendRedirect("/add-test?error=true"); // Redirect on error
-        }
-    }
-
-    // Save file to 'uploads' folder
-    private String saveUploadedFile(Part filePart) throws IOException {
-        String uploadDir = getServletContext().getRealPath("") + File.separator + "uploads";
-        File uploadFolder = new File(uploadDir);
-        if (!uploadFolder.exists()) {
-            uploadFolder.mkdir();
+            LOGGER.log(Level.SEVERE, "Database error", e);
+            request.setAttribute("error", "Database error: " + e.getMessage());
         }
 
-        String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-        File file = new File(uploadDir, fileName);
-
-        try (InputStream input = filePart.getInputStream();
-             FileOutputStream output = new FileOutputStream(file)) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = input.read(buffer)) != -1) {
-                output.write(buffer, 0, bytesRead);
-            }
-        }
-        return "uploads/" + fileName;
+        // Forward to the response page
+        request.getRequestDispatcher("/add_test.jsp").forward(request, response);
     }
 }
