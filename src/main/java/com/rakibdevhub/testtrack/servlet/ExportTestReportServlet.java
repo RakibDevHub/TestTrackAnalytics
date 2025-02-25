@@ -56,14 +56,14 @@ public class ExportTestReportServlet extends HttpServlet {
                             null // Placeholder, we will handle the blob seperately.
                     );
 
-                    String attachmentBase64 = ""; // Initialize attachmentBase64.
-                    Blob attachmentBlob = rs.getBlob("attachment");
-                    if (attachmentBlob != null) {
-                        try (InputStream inputStream = attachmentBlob.getBinaryStream()) {
-                            byte[] bytes = inputStream.readAllBytes();
-                            attachmentBase64 = Base64.getEncoder().encodeToString(bytes);
-                        }
-                    }
+//                    String attachmentBase64 = ""; // Initialize attachmentBase64.
+//                    Blob attachmentBlob = rs.getBlob("attachment");
+//                    if (attachmentBlob != null) {
+//                        try (InputStream inputStream = attachmentBlob.getBinaryStream()) {
+//                            byte[] bytes = inputStream.readAllBytes();
+//                            attachmentBase64 = Base64.getEncoder().encodeToString(bytes);
+//                        }
+//                    }
 
                     // CSV Row
                     writer.println(
@@ -79,7 +79,7 @@ public class ExportTestReportServlet extends HttpServlet {
                             + csvEscape(report.getActualResult()) + ","
                             + csvEscape(report.getErrorMessage()) + ","
                             + csvEscape(report.getTestResult()) + ","
-                            + csvEscape(attachmentBase64) // Include base64 encoded attachment.
+//                            + csvEscape(attachmentBase64) // Include base64 encoded attachment.
                     );
                 }
             }
