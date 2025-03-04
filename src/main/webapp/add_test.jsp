@@ -174,7 +174,7 @@
         </main>
         <!-- Sticky Footer -->
         <footer class="text-center py-6 mt-auto text-gray-600 shadow-t">
-            &copy; 2025 BugCheck Analytics | Built for efficient bug tracking
+            &copy; 2025 TestTrack Analytics | Built for efficient bug tracking
         </footer>
     </body>
 </html>

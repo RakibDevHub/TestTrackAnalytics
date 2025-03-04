@@ -51,7 +51,9 @@
         <nav class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 shadow-lg">
             <div class="container mx-auto flex justify-between items-center">
                 <h1 class="text-2xl font-bold flex items-center">
-                    <i class="fas fa-bug mr-2"></i> TestTrack Analytics
+                    <a href="<%= request.getContextPath()%>/home">
+                        <i class="fas fa-bug mr-2"></i> TestTrack Analytics
+                    </a>
                 </h1>
                 <a href="<%= request.getContextPath()%>/home" class="px-4 py-2 bg-white text-blue-600 rounded-lg shadow hover:bg-gray-200 transition duration-300">Home</a>
             </div>
@@ -148,7 +150,7 @@
         </div>
 
         <footer class="text-center py-6 mt-auto text-gray-600 shadow-t">
-            &copy; 2025 BugCheck Analytics | Built for efficient bug tracking
+            &copy; 2025 TestTrack Analytics | Built for efficient bug tracking
         </footer>
 
         <button id="scrollTopBtn" title="Go to top"><i class="fas fa-arrow-up"></i></button>
